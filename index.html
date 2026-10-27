@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>모닝 마인드 (Morning Mind) - 아침 명상 & 마인드셋 저널</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            morning: {
+              50: '#fdfbf7',
+              100: '#f7f3eb',
+              200: '#eee5d5',
+              300: '#dfcfb5',
+              400: '#cbb38e',
+              500: '#bc9c70',
+              600: '#a8855a',
+              700: '#8c6b48',
+              800: '#73573e',
+              900: '#5e4835',
+            },
+            sage: {
+              50: '#f4f7f4',
+              100: '#e5ece5',
+              200: '#ceddce',
+              300: '#aac4aa',
+              400: '#7fa680',
+              500: '#608b61',
+              600: '#4a6e4b',
+              700: '#3c583d',
+            }
+          },
+          fontFamily: {
+            sans: ['Pretendard', '-apple-system', 'BlinkMacSystemFont', 'system-ui', 'Roboto', 'sans-serif'],
+            serif: ['Georgia', 'Cambria', 'serif']
+          }
+        }
+      }
+    }
+  </script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Canvas Confetti -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <style>
+    @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+    body {
+      font-family: 'Pretendard', sans-serif;
+    }
+    .custom-scroll::-webkit-scrollbar {
+      width: 6px;
+    }
+    .custom-scroll::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .custom-scroll::-webkit-scrollbar-thumb {
+      background-color: rgba(188, 156, 112, 0.3);
+      border-radius: 9999px;
+    }
+  </style>
+</head>
+<body class="bg-morning-50 text-stone-800 dark:bg-stone-900 dark:text-stone-100 min-h-screen transition-colors duration-300">
+
+  <!-- Header -->
+  <header class="border-b border-stone-200/80 dark:border-stone-800 bg-white/70 dark:bg-stone-900/70 backdrop-blur-md sticky top-0 z-40">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-amber-400 to-amber-200 flex items-center justify-center shadow-md shadow-amber-200/50 dark:shadow-none">
+          <i data-lucide="sun" class="w-6 h-6 text-amber-800"></i>
+        </div>
+        <div>
+          <h1 class="text-xl font-bold tracking-tight text-stone-900 dark:text-white flex items-center gap-2">
+            모닝 마인드 <span class="text-xs px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 font-medium">Morning Mind</span>
+          </h1>
+          <p class="text-xs text-stone-500 dark:text-stone-400" id="currentDateDisplay">오늘의 날짜 로딩 중...</p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2 sm:gap-3">
+        <!-- Tab Navigation -->
+        <div class="flex bg-stone-100 dark:bg-stone-800 p-1 rounded-xl text-sm font-medium">
+          <button id="navTodayBtn" onclick="switchView('today')" class="px-3.5 py-1.5 rounded-lg bg-white dark:bg-stone-700 shadow-sm text-stone-900 dark:text-white flex items-center gap-1.5 transition">
+            <i data-lucide="sparkles" class="w-4 h-4 text-amber-500"></i>
+            <span>오늘의 루틴</span>
+          </button>
+          <button id="navHistoryBtn" onclick="switchView('history')" class="px-3.5 py-1.5 rounded-lg text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-white flex items-center gap-1.5 transition">
+            <i data-lucide="calendar" class="w-4 h-4"></i>
+            <span>기록 보관소</span>
+          </button>
+        </div>
+
+        <!-- Dark mode toggle -->
+        <button onclick="toggleDarkMode()" class="p-2.5 rounded-xl border border-stone-200 dark:border-stone-700 hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-600 dark:text-stone-300 transition" title="화면 테마 변경">
+          <i data-lucide="moon" class="w-4 h-4 hidden dark:block"></i>
+          <i data-lucide="sun" class="w-4 h-4 block dark:hidden"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="max-w-6xl mx-auto px-4 sm:px-6 py-8">
+
+    <!-- VIEW 1: TODAY'S ROUTINE -->
+    <div id="todayView" class="space-y-8">
+      
+      <!-- Top Banner: Daily Inspiration Quote -->
+      <section class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-amber-100/90 via-orange-50/80 to-amber-50/90 dark:from-stone-800/90 dark:via-stone-800/60 dark:to-stone-800/90 border border-amber-200/60 dark:border-stone-700 p-6 sm:p-8 shadow-sm">
+        <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative z-10">
+          <div class="space-y-2 max-w-3xl">
+            <div class="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-amber-700 dark:text-amber-400">
+              <i data-lucide="feather" class="w-4 h-4"></i>
+              오늘의 마음가짐 글귀 (Daily Inspiration)
+            </div>
+            <p id="quoteText" class="text-lg sm:text-xl font-serif italic text-stone-800 dark:text-stone-100 leading-relaxed">
+              "모든 아침은 새로운 시작이며, 오늘 하루의 평온과 에너지는 지금 나의 선택에 달려있습니다."
+            </p>
+            <p id="quoteAuthor" class="text-sm font-medium text-stone-500 dark:text-stone-400">— 모닝 마인드셀프</p>
+          </div>
+          <div class="flex items-center gap-2 self-end md:self-center shrink-0">
+            <button onclick="refreshQuote()" class="px-3 py-2 rounded-xl bg-white/80 dark:bg-stone-700/80 hover:bg-white dark:hover:bg-stone-700 border border-amber-200/80 dark:border-stone-600 text-xs font-medium text-stone-700 dark:text-stone-200 shadow-sm flex items-center gap-1.5 transition">
+              <i data-lucide="rotate-cw" class="w-3.5 h-3.5"></i>
+              <span>다른 글귀 보기</span>
+            </button>
+            <button onclick="copyQuoteToJournal()" class="px-3 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-xs font-medium shadow-sm shadow-amber-500/20 flex items-center gap-1.5 transition">
+              <i data-lucide="quote" class="w-3.5 h-3.5"></i>
+              <span>오늘의 글귀 인용하기</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2 Columns Grid: Music / Meditation & Journaling Form -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        
+        <!-- Left: Meditation Music Player & Timer (5 cols) -->
+        <section class="lg:col-span-5 space-y-6">
+          <div class="bg-white dark:bg-stone-800/90 rounded-3xl border border-stone-200 dark:border-stone-700 p-6 shadow-sm space-y-5">
+            <div class="flex items-center justify-between">
+              <h2 class="text-lg font-bold text-stone-900 dark:text-white flex items-center gap-2">
+                <i data-lucide="headphones" class="w-5 h-5 text-amber-500"></i>
+                <span>아침 명상 음악</span>
+              </h2>
+              <span class="text-xs px-2.5 py-1 rounded-full bg-sage-100 dark:bg-sage-900/60 text-sage-700 dark:text-sage-300 font-medium flex items-center gap-1">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                실시간 스트리밍
+              </span>
+            </div>
+
+            <!-- YouTube Video Embed Frame -->
+            <div class="relative w-full aspect-video rounded-2xl overflow-hidden bg-stone-900 shadow-inner">
+              <iframe 
+                id="youtubePlayer" 
+                class="w-full h-full" 
+                src="https://www.youtube.com/embed/inpok4MKVLM?enablejsapi=1" 
+                title="모닝 명상 음악" 
+                frameborder="0" 
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                allowfullscreen>
+              </iframe>
+            </div>
+
+            <!-- Preset Tracks Selection -->
+            <div class="space-y-2">
+              <label class="text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-wider">추천 명상 트랙 선택</label>
+              <div class="grid grid-cols-1 gap-2" id="presetTrackList">
+                <!-- Tracks dynamically injected by JS -->
+              </div>
+            </div>
+
+            <!-- Custom YouTube URL Input -->
+            <div class="pt-2 border-t border-stone-100 dark:border-stone-700">
+              <div class="flex items-center justify-between mb-1.5">
+                <label class="text-xs font-medium text-stone-600 dark:text-stone-300">직접 유튜브 링크 넣기</label>
+              </div>
+              <div class="flex gap-2">
+                <input 
+                  type="text" 
+                  id="customYoutubeInput" 
+                  placeholder="https://youtu.be/... 또는 유튜브 URL" 
+                  class="flex-1 text-xs px-3 py-2 rounded-xl border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-900 focus:outline-none focus:ring-2 focus:ring-amber-400">
+                <button 
+                  onclick="loadCustomYoutube()" 
+                  class="px-3 py-2 bg-stone-800 hover:bg-stone-700 dark:bg-stone-700 dark:hover:bg-stone-600 text-white rounded-xl text-xs font-medium transition">
+                  재생
+                </button>
+              </div>
+            </div>
+
+            <!-- Simple Meditation Timer -->
+            <div class="pt-4 border-t border-stone-100 dark:border-stone-700 space-y-3">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-wider flex items-center gap-1.5">
+                  <i data-lucide="clock" class="w-3.5 h-3.5"></i>
+                  명상 타이머
+                </span>
+                <span id="timerDisplay" class="font-mono text-base font-bold text-amber-600 dark:text-amber-400">10:00</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <button onclick="setTimer(5)" class="flex-1 py-1.5 text-xs font-medium rounded-lg border border-stone-200 dark:border-stone-700 hover:bg-stone-100 dark:hover:bg-stone-700 transition">5분</button>
+                <button onclick="setTimer(10)" class="flex-1 py-1.5 text-xs font-medium rounded-lg border border-amber-300 dark:border-amber-700 bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 transition">10분</button>
+                <button onclick="setTimer(15)" class="flex-1 py-1.5 text-xs font-medium rounded-lg border border-stone-200 dark:border-stone-700 hover:bg-stone-100 dark:hover:bg-stone-700 transition">15분</button>
+                <button onclick="toggleTimer()" id="timerStartBtn" class="px-4 py-1.5 text-xs font-semibold rounded-lg bg-amber-500 hover:bg-amber-600 text-white transition flex items-center gap-1">
+                  <i data-lucide="play" class="w-3 h-3"></i> 시작
+                </button>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- Right: Morning Journal & Reflection (7 cols) -->
+        <section class="lg:col-span-7 space-y-6">
+          <div class="bg-white dark:bg-stone-800/90 rounded-3xl border border-stone-200 dark:border-stone-700 p-6 sm:p-8 shadow-sm space-y-6">
+            
+            <div class="flex items-center justify-between border-b border-stone-100 dark:border-stone-700 pb-4">
+              <div>
+                <h2 class="text-xl font-bold text-stone-900 dark:text-white flex items-center gap-2">
+                  <i data-lucide="edit-3" class="w-5 h-5 text-amber-500"></i>
+                  <span>오늘의 마음가짐 기록 (Morning Journal)</span>
+                </h2>
+                <p class="text-xs text-stone-500 dark:text-stone-400 mt-0.5">명상과 글귀를 접한 후 마음에 떠오른 감정과 다짐을 적어보세요.</p>
+              </div>
+              <span id="savedStatusBadge" class="hidden text-xs px-2.5 py-1 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 font-medium items-center gap-1">
+                <i data-lucide="check-circle" class="w-3.5 h-3.5"></i> 저장 완료
+              </span>
+            </div>
+
+            <!-- Mood Selector -->
+            <div class="space-y-2">
+              <label class="text-xs font-semibold text-stone-600 dark:text-stone-300">오늘 아침 나의 마음 상태 (Mood)</label>
+              <div class="grid grid-cols-5 gap-2" id="moodSelector">
+                <button type="button" onclick="selectMood('peaceful', this)" class="mood-btn p-3 rounded-2xl border-2 border-stone-200 dark:border-stone-700 hover:border-amber-400 flex flex-col items-center gap-1 transition bg-stone-50/50 dark:bg-stone-800/50">
+                  <span class="text-2xl">🌿</span>
+                  <span class="text-[11px] font-medium text-stone-600 dark:text-stone-300">평온함</span>
+                </button>
+                <button type="button" onclick="selectMood('energetic', this)" class="mood-btn p-3 rounded-2xl border-2 border-stone-200 dark:border-stone-700 hover:border-amber-400 flex flex-col items-center gap-1 transition bg-stone-50/50 dark:bg-stone-800/50">
+                  <span class="text-2xl">☀️</span>
+                  <span class="text-[11px] font-medium text-stone-600 dark:text-stone-300">활기참</span>
+                </button>
+                <button type="button" onclick="selectMood('grateful', this)" class="mood-btn p-3 rounded-2xl border-2 border-stone-200 dark:border-stone-700 hover:border-amber-400 flex flex-col items-center gap-1 transition bg-stone-50/50 dark:bg-stone-800/50">
+                  <span class="text-2xl">🙏</span>
+                  <span class="text-[11px] font-medium text-stone-600 dark:text-stone-300">감사함</span>
+                </button>
+                <button type="button" onclick="selectMood('focused', this)" class="mood-btn p-3 rounded-2xl border-2 border-stone-200 dark:border-stone-700 hover:border-amber-400 flex flex-col items-center gap-1 transition bg-stone-50/50 dark:bg-stone-800/50">
+                  <span class="text-2xl">🎯</span>
+                  <span class="text-[11px] font-medium text-stone-600 dark:text-stone-300">집중/몰입</span>
+                </button>
+                <button type="button" onclick="selectMood('calm', this)" class="mood-btn p-3 rounded-2xl border-2 border-stone-200 dark:border-stone-700 hover:border-amber-400 flex flex-col items-center gap-1 transition bg-stone-50/50 dark:bg-stone-800/50">
+                  <span class="text-2xl">☕</span>
+                  <span class="text-[11px] font-medium text-stone-600 dark:text-stone-300">차분함</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Affirmation / Today's Core Intention -->
+            <div class="space-y-1.5">
+              <label for="intentionInput" class="text-xs font-semibold text-stone-600 dark:text-stone-300 flex items-center justify-between">
+                <span>오늘의 한 줄 확언 / 다짐 (Today's Affirmation)</span>
+                <span class="text-[11px] text-stone-400 font-normal">예: 나는 오늘 하루도 흔들림 없이 나만의 속도로 걷는다.</span>
+              </label>
+              <input 
+                type="text" 
+                id="intentionInput" 
+                placeholder="오늘 하루를 관통할 나만의 한 문장을 남겨보세요" 
+                class="w-full px-4 py-3 rounded-xl border border-stone-200 dark:border-stone-700 bg-stone-50/50 dark:bg-stone-900 focus:outline-none focus:ring-2 focus:ring-amber-400 text-sm font-medium">
+            </div>
+
+            <!-- Three Gratitudes -->
+            <div class="space-y-2">
+              <label class="text-xs font-semibold text-stone-600 dark:text-stone-300 flex items-center gap-1">
+                <i data-lucide="heart" class="w-3.5 h-3.5 text-rose-500"></i>
+                오늘 감사한 것 3가지 (Gratitude)
+              </label>
+              <div class="grid grid-cols-1 gap-2">
+                <input type="text" id="gratitude1" placeholder="1. 편안하게 일어날 수 있었던 아침..." class="w-full px-3 py-2 text-xs rounded-xl border border-stone-200 dark:border-stone-700 bg-stone-50/50 dark:bg-stone-900 focus:outline-none focus:ring-2 focus:ring-amber-400">
+                <input type="text" id="gratitude2" placeholder="2. 따뜻한 차 한 잔의 여유..." class="w-full px-3 py-2 text-xs rounded-xl border border-stone-200 dark:border-stone-700 bg-stone-50/50 dark:bg-stone-900 focus:outline-none focus:ring-2 focus:ring-amber-400">
+                <input type="text" id="gratitude3" placeholder="3. 함께 응원해 주는 소중한 사람들..." class="w-full px-3 py-2 text-xs rounded-xl border border-stone-200 dark:border-stone-700 bg-stone-50/50 dark:bg-stone-900 focus:outline-none focus:ring-2 focus:ring-amber-400">
+              </div>
+            </div>
+
+            <!-- Deep Reflection Journal Area -->
+            <div class="space-y-1.5">
+              <label for="journalContent" class="text-xs font-semibold text-stone-600 dark:text-stone-300">
+                명상 후 마음가짐 및 생각 기록 (Reflection)
+              </label>
+              <textarea 
+                id="journalContent" 
+                rows="6" 
+                placeholder="명상 음악을 들으며 느낀 점, 오늘 마주할 일들에 임하는 마음가짐을 자유롭게 풀어내 보세요..." 
+                class="w-full p-4 rounded-2xl border border-stone-200 dark:border-stone-700 bg-stone-50/50 dark:bg-stone-900 focus:outline-none focus:ring-2 focus:ring-amber-400 text-sm leading-relaxed custom-scroll"></textarea>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex items-center justify-between pt-2">
+              <button 
+                type="button" 
+                onclick="resetForm()" 
+                class="text-xs text-stone-500 hover:text-stone-800 dark:hover:text-stone-200 underline underline-offset-4 transition">
+                내용 초기화
+              </button>
+              <button 
+                type="button" 
+                onclick="saveJournalEntry()" 
+                class="px-6 py-3 rounded-2xl bg-amber-500 hover:bg-amber-600 active:scale-95 text-white font-semibold text-sm shadow-md shadow-amber-500/30 flex items-center gap-2 transition duration-200">
+                <i data-lucide="check" class="w-4 h-4"></i>
+                <span>오늘의 마음가짐 저장하기</span>
+              </button>
+            </div>
+
+          </div>
+        </section>
+
+      </div>
+    </div>
+
+    <!-- VIEW 2: HISTORY & ARCHIVE (SEARCHABLE) -->
+    <div id="historyView" class="hidden space-y-6">
+      
+      <!-- Search & Filter Controls -->
+      <div class="bg-white dark:bg-stone-800/90 rounded-3xl border border-stone-200 dark:border-stone-700 p-6 shadow-sm space-y-4">
+        <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+          <div>
+            <h2 class="text-xl font-bold text-stone-900 dark:text-white flex items-center gap-2">
+              <i data-lucide="archive" class="w-5 h-5 text-amber-500"></i>
+              <span>마음가짐 기록 보관소</span>
+            </h2>
+            <p class="text-xs text-stone-500 dark:text-stone-400 mt-0.5">날짜별로 지난 명상과 아침의 마음가짐 기록을 검색하고 다시 읽어보세요.</p>
+          </div>
+
+          <!-- Backup / Restore Tools -->
+          <div class="flex items-center gap-2 self-end md:self-center">
+            <button onclick="exportData()" class="px-3 py-1.5 rounded-xl border border-stone-200 dark:border-stone-700 hover:bg-stone-100 dark:hover:bg-stone-700 text-xs font-medium text-stone-700 dark:text-stone-300 flex items-center gap-1.5 transition">
+              <i data-lucide="download" class="w-3.5 h-3.5"></i> 백업 내보내기
+            </button>
+            <label class="px-3 py-1.5 rounded-xl border border-stone-200 dark:border-stone-700 hover:bg-stone-100 dark:hover:bg-stone-700 text-xs font-medium text-stone-700 dark:text-stone-300 flex items-center gap-1.5 transition cursor-pointer">
+              <i data-lucide="upload" class="w-3.5 h-3.5"></i> 가져오기
+              <input type="file" id="importFileInput" onchange="importData(event)" class="hidden" accept=".json">
+            </label>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-12 gap-3 pt-2">
+          <!-- Keyword Search -->
+          <div class="sm:col-span-6 relative">
+            <i data-lucide="search" class="w-4 h-4 absolute left-3.5 top-3 text-stone-400"></i>
+            <input 
+              type="text" 
+              id="searchInput" 
+              oninput="renderHistoryList()" 
+              placeholder="기록 내용, 다짐, 감사 키워드 검색..." 
+              class="w-full pl-9 pr-4 py-2.5 rounded-xl border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-900 text-xs focus:outline-none focus:ring-2 focus:ring-amber-400">
+          </div>
+          <!-- Date Filter -->
+          <div class="sm:col-span-3">
+            <input 
+              type="date" 
+              id="dateFilterInput" 
+              onchange="renderHistoryList()" 
+              class="w-full px-3 py-2.5 rounded-xl border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-900 text-xs focus:outline-none focus:ring-2 focus:ring-amber-400">
+          </div>
+          <!-- Reset Filters -->
+          <div class="sm:col-span-3 flex items-center gap-2">
+            <button 
+              onclick="resetHistoryFilters()" 
+              class="w-full py-2.5 rounded-xl bg-stone-100 dark:bg-stone-700 hover:bg-stone-200 dark:hover:bg-stone-600 text-stone-700 dark:text-stone-300 text-xs font-medium transition flex items-center justify-center gap-1">
+              <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> 필터 초기화
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- History List Container -->
+      <div id="historyListContainer" class="space-y-4">
+        <!-- Rendered dynamically by JS -->
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- Detail Modal -->
+  <div id="detailModal" class="hidden fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-stone-800 rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6 sm:p-8 shadow-2xl border border-stone-200 dark:border-stone-700 space-y-6 relative">
+      <button onclick="closeDetailModal()" class="absolute right-5 top-5 p-2 rounded-xl text-stone-400 hover:text-stone-700 dark:hover:text-stone-200 hover:bg-stone-100 dark:hover:bg-stone-700 transition">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+
+      <div id="modalContent" class="space-y-4">
+        <!-- Injected by JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Audio ding for timer completion -->
+  <audio id="bellSound" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" preload="auto"></audio>
+
+  <script>
+    // Preset YouTube meditation tracks
+    const PRESET_TRACKS = [
+      {
+        id: "inpok4MKVLM",
+        title: "새벽 숲속의 고요와 피아노 명상",
+        desc: "맑고 차분한 하루를 여는 잔잔한 자연 피아노 선율",
+        duration: "3시간"
+      },
+      {
+        id: "4xDzrJKXOOY",
+        title: "긍정 에너지 & 마인드 리셋 로파이",
+        desc: "아침 기분을 산뜻하고 가볍게 북돋아 주는 부드러운 비트",
+        duration: "2시간"
+      },
+      {
+        id: "1ZYbU82GVz4",
+        title: "스트레스 해소 528Hz 싱잉볼 사운드",
+        desc: "복잡한 생각을 비우고 깊은 이완과 집중을 돕는 주파수",
+        duration: "1시간"
+      },
+      {
+        id: "WPni755-Krg",
+        title: "따스한 아침 햇살과 어쿠스틱 기타",
+        desc: "하루를 감사와 설렘으로 맞이하는 온화한 멜로디",
+        duration: "4시간"
+      }
+    ];
+
+    // Daily Quotes Library
+    const INSPIRATION_QUOTES = [
+      {
+        quote: "모든 아침은 새로운 시작이며, 오늘 하루의 평온과 에너지는 지금 나의 선택에 달려있습니다.",
+        author: "모닝 마인드"
+      },
+      {
+        quote: "마음이 고요해지면 세상의 모든 소음 속에서도 나만의 속도와 방향을 발견할 수 있다.",
+        author: "달라이 라마"
+      },
+      {
+        quote: "어제는 이미 지나갔고, 내일은 아직 오지 않았다. 우리에게 주어진 가장 확실한 선물은 바로 '오늘'이다.",
+        author: "마더 테레사"
+      },
+      {
+        quote: "당신이 아침에 눈을 뜨며 품는 첫 번째 생각은 그날 하루 전체의 색채를 결정한다.",
+        author: "마르쿠스 아우렐리우스"
+      },
+      {
+        quote: "작은 감사 하나가 오늘의 기적을 만들고, 차분한 숨 한 번이 내면의 깊은 평화를 부른다.",
+        author: "틱낫한"
+      },
+      {
+        quote: "남들과 비교하지 말고, 어제의 나보다 조금 더 온화하고 단단한 내가 되는 것에 집중하라.",
+        author: "아침의 사색"
+      }
+    ];
+
+    // State Variables
+    let currentMood = 'peaceful';
+    let currentQuoteIndex = 0;
+    let timerInterval = null;
+    let timerRemainingSeconds = 600; // 10 mins default
+    let isTimerRunning = false;
+
+    // Initialization
+    document.addEventListener('DOMContentLoaded', () => {
+      initDateDisplay();
+      initPresetTracks();
+      loadTodayQuote();
+      loadTodayExistingEntry();
+      lucide.createIcons();
+    });
+
+    // Date Display
+    function initDateDisplay() {
+      const now = new Date();
+      const options = { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' };
+      const formatted = now.toLocaleDateString('ko-KR', options);
+      document.getElementById('currentDateDisplay').textContent = formatted;
+    }
+
+    // Preset Tracks Ingestion
+    function initPresetTracks() {
+      const container = document.getElementById('presetTrackList');
+      container.innerHTML = '';
+
+      PRESET_TRACKS.forEach((track, idx) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.onclick = () => playYoutubeTrack(track.id, btn);
+        btn.className = `w-full text-left p-3 rounded-2xl border transition flex items-center justify-between group ${
+          idx === 0 
+            ? 'border-amber-400 bg-amber-50/60 dark:bg-amber-950/30' 
+            : 'border-stone-200 dark:border-stone-700 hover:border-amber-300 dark:hover:border-stone-600 bg-stone-50/40 dark:bg-stone-900/40'
+        }`;
+        btn.innerHTML = `
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-xl bg-amber-100 dark:bg-amber-900/60 text-amber-700 dark:text-amber-300 flex items-center justify-center font-bold text-xs shrink-0">
+              ${idx + 1}
+            </div>
+            <div>
+              <p class="text-xs font-semibold text-stone-800 dark:text-stone-200 group-hover:text-amber-600 dark:group-hover:text-amber-400">${track.title}</p>
+              <p class="text-[11px] text-stone-400">${track.desc}</p>
+            </div>
+          </div>
+          <span class="text-[10px] text-stone-400 font-mono px-2 py-0.5 rounded bg-stone-100 dark:bg-stone-800">${track.duration}</span>
+        `;
+        container.appendChild(btn);
+      });
+    }
+
+    // Play YouTube Track
+    function playYoutubeTrack(videoId, btnEl) {
+      const player = document.getElementById('youtubePlayer');
+      player.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&enablejsapi=1`;
+
+      if (btnEl) {
+        document.querySelectorAll('#presetTrackList button').forEach(b => {
+          b.className = b.className.replace('border-amber-400 bg-amber-50/60 dark:bg-amber-950/30', 'border-stone-200 dark:border-stone-700 bg-stone-50/40 dark:bg-stone-900/40');
+        });
+        btnEl.className = btnEl.className.replace('border-stone-200 dark:border-stone-700 bg-stone-50/40 dark:bg-stone-900/40', 'border-amber-400 bg-amber-50/60 dark:bg-amber-950/30');
+      }
+    }
+
+    // Custom YouTube URL extraction & load
+    function loadCustomYoutube() {
+      const input = document.getElementById('customYoutubeInput');
+      const val = input.value.trim();
+      if (!val) return;
+
+      let videoId = '';
+      if (val.includes('youtu.be/')) {
+        videoId = val.split('youtu.be/')[1]?.split('?')[0];
+      } else if (val.includes('watch?v=')) {
+        videoId = val.split('watch?v=')[1]?.split('&')[0];
+      } else if (val.includes('embed/')) {
+        videoId = val.split('embed/')[1]?.split('?')[0];
+      } else {
+        videoId = val;
+      }
+
+      if (videoId) {
+        playYoutubeTrack(videoId, null);
+        alert('유튜브 음악이 로드되었습니다!');
+      } else {
+        alert('올바른 유튜브 영상 URL을 입력해 주세요.');
+      }
+    }
+
+    // Daily Quote
+    function loadTodayQuote() {
+      const dayOfYear = Math.floor((new Date() - new Date(new Date().getFullYear(), 0, 0)) / (1000 * 60 * 60 * 24));
+      currentQuoteIndex = dayOfYear % INSPIRATION_QUOTES.length;
+      displayQuote();
+    }
+
+    function refreshQuote() {
+      currentQuoteIndex = (currentQuoteIndex + 1) % INSPIRATION_QUOTES.length;
+      displayQuote();
+    }
+
+    function displayQuote() {
+      const item = INSPIRATION_QUOTES[currentQuoteIndex];
+      document.getElementById('quoteText').textContent = `"${item.quote}"`;
+      document.getElementById('quoteAuthor').textContent = `— ${item.author}`;
+    }
+
+    function copyQuoteToJournal() {
+      const item = INSPIRATION_QUOTES[currentQuoteIndex];
+      const textarea = document.getElementById('journalContent');
+      const quoteBlock = `[오늘의 글귀 인용]\n"${item.quote}" — ${item.author}\n\n`;
+      if (!textarea.value.includes(item.quote)) {
+        textarea.value = quoteBlock + textarea.value;
+      }
+      textarea.focus();
+    }
+
+    // Mood Selector
+    function selectMood(mood, btnEl) {
+      currentMood = mood;
+      document.querySelectorAll('.mood-btn').forEach(b => {
+        b.classList.remove('border-amber-500', 'bg-amber-50', 'dark:bg-amber-950/40', 'shadow-sm');
+        b.classList.add('border-stone-200', 'dark:border-stone-700');
+      });
+      if (btnEl) {
+        btnEl.classList.remove('border-stone-200', 'dark:border-stone-700');
+        btnEl.classList.add('border-amber-500', 'bg-amber-50', 'dark:bg-amber-950/40', 'shadow-sm');
+      }
+    }
+
+    // Timer Controls
+    function setTimer(minutes) {
+      if (isTimerRunning) toggleTimer();
+      timerRemainingSeconds = minutes * 60;
+      updateTimerDisplay();
+    }
+
+    function toggleTimer() {
+      const btn = document.getElementById('timerStartBtn');
+      if (isTimerRunning) {
+        clearInterval(timerInterval);
+        isTimerRunning = false;
+        btn.innerHTML = `<i data-lucide="play" class="w-3 h-3"></i> 시작`;
+      } else {
+        isTimerRunning = true;
+        btn.innerHTML = `<i data-lucide="pause" class="w-3 h-3"></i> 정지`;
+        timerInterval = setInterval(() => {
+          if (timerRemainingSeconds > 0) {
+            timerRemainingSeconds--;
+            updateTimerDisplay();
+          } else {
+            clearInterval(timerInterval);
+            isTimerRunning = false;
+            btn.innerHTML = `<i data-lucide="play" class="w-3 h-3"></i> 시작`;
+            playBell();
+            confetti({ particleCount: 50, spread: 60, origin: { y: 0.8 } });
+            alert('🔔 명상 타이머가 종료되었습니다. 오늘의 평온한 마음가짐을 기록해 보세요!');
+          }
+        }, 1000);
+      }
+      lucide.createIcons();
+    }
+
+    function updateTimerDisplay() {
+      const m = Math.floor(timerRemainingSeconds / 60).toString().padStart(2, '0');
+      const s = (timerRemainingSeconds % 60).toString().padStart(2, '0');
+      document.getElementById('timerDisplay').textContent = `${m}:${s}`;
+    }
+
+    function playBell() {
+      const bell = document.getElementById('bellSound');
+      if (bell) bell.play().catch(() => {});
+    }
+
+    // Storage Management
+    function getTodayKey() {
+      const now = new Date();
+      return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+    }
+
+    function getAllEntries() {
+      try {
+        return JSON.parse(localStorage.getItem('morning_mind_entries') || '{}');
+      } catch (e) {
+        return {};
+      }
+    }
+
+    function loadTodayExistingEntry() {
+      const todayKey = getTodayKey();
+      const entries = getAllEntries();
+      const entry = entries[todayKey];
+      if (entry) {
+        document.getElementById('intentionInput').value = entry.intention || '';
+        document.getElementById('gratitude1').value = entry.gratitudes?.[0] || '';
+        document.getElementById('gratitude2').value = entry.gratitudes?.[1] || '';
+        document.getElementById('gratitude3').value = entry.gratitudes?.[2] || '';
+        document.getElementById('journalContent').value = entry.content || '';
+        
+        if (entry.mood) {
+          const btn = Array.from(document.querySelectorAll('.mood-btn')).find(b => b.getAttribute('onclick')?.includes(entry.mood));
+          if (btn) selectMood(entry.mood, btn);
+        }
+        showSavedBadge();
+      } else {
+        // default select first mood
+        const firstMood = document.querySelector('.mood-btn');
+        if (firstMood) selectMood('peaceful', firstMood);
+      }
+    }
+
+    function saveJournalEntry() {
+      const intention = document.getElementById('intentionInput').value.trim();
+      const g1 = document.getElementById('gratitude1').value.trim();
+      const g2 = document.getElementById('gratitude2').value.trim();
+      const g3 = document.getElementById('gratitude3').value.trim();
+      const content = document.getElementById('journalContent').value.trim();
+
+      if (!intention && !content && !g1) {
+        alert('한 줄 다짐이나 마음가짐 내용을 조금이라도 적어주세요.');
+        return;
+      }
+
+      const todayKey = getTodayKey();
+      const entries = getAllEntries();
+
+      entries[todayKey] = {
+        date: todayKey,
+        updatedAt: new Date().toISOString(),
+        mood: currentMood,
+        intention: intention,
+        gratitudes: [g1, g2, g3].filter(Boolean),
+        content: content,
+        quoteUsed: document.getElementById('quoteText').textContent
+      };
+
+      localStorage.setItem('morning_mind_entries', JSON.stringify(entries));
+
+      // Visual Confetti Celebration
+      confetti({
+        particleCount: 80,
+        spread: 70,
+        origin: { y: 0.6 }
+      });
+
+      showSavedBadge();
+      alert('✨ 오늘의 아침 마음가짐이 소중히 저장되었습니다!');
+    }
+
+    function showSavedBadge() {
+      const badge = document.getElementById('savedStatusBadge');
+      badge.classList.remove('hidden');
+      badge.classList.add('inline-flex');
+    }
+
+    function resetForm() {
+      if (confirm('오늘 작성 중인 내용을 초기화하시겠습니까?')) {
+        document.getElementById('intentionInput').value = '';
+        document.getElementById('gratitude1').value = '';
+        document.getElementById('gratitude2').value = '';
+        document.getElementById('gratitude3').value = '';
+        document.getElementById('journalContent').value = '';
+      }
+    }
+
+    // View Switching
+    function switchView(viewName) {
+      const todayView = document.getElementById('todayView');
+      const historyView = document.getElementById('historyView');
+      const todayBtn = document.getElementById('navTodayBtn');
+      const historyBtn = document.getElementById('navHistoryBtn');
+
+      if (viewName === 'today') {
+        todayView.classList.remove('hidden');
+        historyView.classList.add('hidden');
+        todayBtn.className = "px-3.5 py-1.5 rounded-lg bg-white dark:bg-stone-700 shadow-sm text-stone-900 dark:text-white flex items-center gap-1.5 transition";
+        historyBtn.className = "px-3.5 py-1.5 rounded-lg text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-white flex items-center gap-1.5 transition";
+      } else {
+        todayView.classList.add('hidden');
+        historyView.classList.remove('hidden');
+        historyBtn.className = "px-3.5 py-1.5 rounded-lg bg-white dark:bg-stone-700 shadow-sm text-stone-900 dark:text-white flex items-center gap-1.5 transition";
+        todayBtn.className = "px-3.5 py-1.5 rounded-lg text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-white flex items-center gap-1.5 transition";
+        renderHistoryList();
+      }
+      lucide.createIcons();
+    }
+
+    // History Archive & Search Rendering
+    function renderHistoryList() {
+      const container = document.getElementById('historyListContainer');
+      const searchKey = document.getElementById('searchInput').value.trim().toLowerCase();
+      const dateFilter = document.getElementById('dateFilterInput').value;
+
+      const entries = getAllEntries();
+      const keys = Object.keys(entries).sort().reverse(); // newest first
+
+      container.innerHTML = '';
+
+      const moodEmojiMap = {
+        peaceful: '🌿 평온함',
+        energetic: '☀️ 활기참',
+        grateful: '🙏 감사함',
+        focused: '🎯 몰입',
+        calm: '☕ 차분함'
+      };
+
+      let filteredKeys = keys.filter(dateKey => {
+        const item = entries[dateKey];
+        if (dateFilter && item.date !== dateFilter) return false;
+        if (searchKey) {
+          const matchContent = (item.content || '').toLowerCase().includes(searchKey);
+          const matchIntention = (item.intention || '').toLowerCase().includes(searchKey);
+          const matchGratitude = (item.gratitudes || []).join(' ').toLowerCase().includes(searchKey);
+          if (!matchContent && !matchIntention && !matchGratitude) return false;
+        }
+        return true;
+      });
+
+      if (filteredKeys.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-16 bg-white dark:bg-stone-800/60 rounded-3xl border border-stone-200 dark:border-stone-700 p-8 space-y-3">
+            <div class="w-12 h-12 rounded-2xl bg-amber-50 dark:bg-stone-700 text-amber-500 flex items-center justify-center mx-auto">
+              <i data-lucide="book-open" class="w-6 h-6"></i>
+            </div>
+            <p class="text-sm font-semibold text-stone-700 dark:text-stone-300">저장된 기록이 없거나 검색 결과가 없습니다.</p>
+            <p class="text-xs text-stone-400">오늘 아침 루틴 탭에서 첫 마음가짐을 기록해 보세요.</p>
+          </div>
+        `;
+        lucide.createIcons();
+        return;
+      }
+
+      filteredKeys.forEach(key => {
+        const item = entries[key];
+        const card = document.createElement('div');
+        card.className = "bg-white dark:bg-stone-800 rounded-3xl border border-stone-200 dark:border-stone-700 p-6 shadow-sm hover:border-amber-300 dark:hover:border-stone-600 transition space-y-4";
+        
+        card.innerHTML = `
+          <div class="flex items-center justify-between border-b border-stone-100 dark:border-stone-700 pb-3">
+            <div class="flex items-center gap-3">
+              <span class="text-xs font-mono font-bold text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/60 px-2.5 py-1 rounded-xl">
+                ${item.date}
+              </span>
+              <span class="text-xs px-2.5 py-1 rounded-xl bg-stone-100 dark:bg-stone-700/60 text-stone-600 dark:text-stone-300">
+                ${moodEmojiMap[item.mood] || '🌿 평온함'}
+              </span>
+            </div>
+            <div class="flex items-center gap-2">
+              <button onclick="viewEntryDetail('${item.date}')" class="p-1.5 rounded-lg text-stone-400 hover:text-amber-600 dark:hover:text-amber-400 hover:bg-stone-100 dark:hover:bg-stone-700 transition" title="상세보기">
+                <i data-lucide="eye" class="w-4 h-4"></i>
+              </button>
+              <button onclick="deleteEntry('${item.date}')" class="p-1.5 rounded-lg text-stone-400 hover:text-rose-500 hover:bg-stone-100 dark:hover:bg-stone-700 transition" title="삭제">
+                <i data-lucide="trash-2" class="w-4 h-4"></i>
+              </button>
+            </div>
+          </div>
+
+          ${item.intention ? `
+            <div class="bg-amber-50/50 dark:bg-stone-900/40 p-3 rounded-2xl border border-amber-100 dark:border-stone-700/60">
+              <p class="text-xs font-semibold text-amber-800 dark:text-amber-300">" ${item.intention} "</p>
+            </div>
+          ` : ''}
+
+          <p class="text-xs text-stone-600 dark:text-stone-300 line-clamp-3 leading-relaxed">
+            ${item.content || '(본문 내용 없음)'}
+          </p>
+
+          ${item.gratitudes && item.gratitudes.length > 0 ? `
+            <div class="flex flex-wrap gap-1.5 pt-1">
+              ${item.gratitudes.map(g => `
+                <span class="text-[11px] px-2 py-0.5 rounded-lg bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300 border border-rose-100 dark:border-rose-900/40">
+                  ❤️ ${g}
+                </span>
+              `).join('')}
+            </div>
+          ` : ''}
+        `;
+        container.appendChild(card);
+      });
+
+      lucide.createIcons();
+    }
+
+    function viewEntryDetail(dateKey) {
+      const entries = getAllEntries();
+      const item = entries[dateKey];
+      if (!item) return;
+
+      const modal = document.getElementById('detailModal');
+      const content = document.getElementById('modalContent');
+
+      content.innerHTML = `
+        <div class="space-y-1">
+          <span class="text-xs font-mono font-bold text-amber-600 dark:text-amber-400">${item.date}</span>
+          <h3 class="text-xl font-bold text-stone-900 dark:text-white">마음가짐 기록 상세</h3>
+        </div>
+
+        ${item.intention ? `
+          <div class="p-4 rounded-2xl bg-amber-50 dark:bg-stone-900 border border-amber-200 dark:border-stone-700">
+            <p class="text-xs font-semibold text-amber-800 dark:text-amber-300 uppercase">오늘의 다짐</p>
+            <p class="text-sm font-bold text-stone-800 dark:text-stone-100 mt-1">"${item.intention}"</p>
+          </div>
+        ` : ''}
+
+        ${item.gratitudes && item.gratitudes.length > 0 ? `
+          <div class="space-y-2">
+            <h4 class="text-xs font-semibold text-stone-500 uppercase tracking-wider">감사한 일들</h4>
+            <ul class="space-y-1 text-xs text-stone-700 dark:text-stone-300">
+              ${item.gratitudes.map(g => `<li class="flex items-center gap-2"><span>✨</span> ${g}</li>`).join('')}
+            </ul>
+          </div>
+        ` : ''}
+
+        <div class="space-y-2">
+          <h4 class="text-xs font-semibold text-stone-500 uppercase tracking-wider">명상 후 성찰</h4>
+          <div class="p-4 rounded-2xl bg-stone-50 dark:bg-stone-900 text-xs text-stone-800 dark:text-stone-200 leading-relaxed whitespace-pre-wrap">
+            ${item.content || '작성된 내용이 없습니다.'}
+          </div>
+        </div>
+
+        ${item.quoteUsed ? `
+          <div class="text-[11px] text-stone-400 border-t border-stone-100 dark:border-stone-700 pt-3">
+            접했던 글귀: ${item.quoteUsed}
+          </div>
+        ` : ''}
+      `;
+
+      modal.classList.remove('hidden');
+      lucide.createIcons();
+    }
+
+    function closeDetailModal() {
+      document.getElementById('detailModal').classList.add('hidden');
+    }
+
+    function deleteEntry(dateKey) {
+      if (confirm(`${dateKey}의 기록을 삭제하시겠습니까?`)) {
+        const entries = getAllEntries();
+        delete entries[dateKey];
+        localStorage.setItem('morning_mind_entries', JSON.stringify(entries));
+        renderHistoryList();
+        if (dateKey === getTodayKey()) {
+          document.getElementById('savedStatusBadge').classList.add('hidden');
+        }
+      }
+    }
+
+    function resetHistoryFilters() {
+      document.getElementById('searchInput').value = '';
+      document.getElementById('dateFilterInput').value = '';
+      renderHistoryList();
+    }
+
+    // Export & Import Backup
+    function exportData() {
+      const data = localStorage.getItem('morning_mind_entries') || '{}';
+      const blob = new Blob([data], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `morning-mind-backup-${getTodayKey()}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function importData(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const parsed = JSON.parse(e.target.result);
+          if (typeof parsed === 'object') {
+            const current = getAllEntries();
+            const merged = { ...current, ...parsed };
+            localStorage.setItem('morning_mind_entries', JSON.stringify(merged));
+            alert('데이터를 성공적으로 복원했습니다!');
+            renderHistoryList();
+            loadTodayExistingEntry();
+          }
+        } catch (err) {
+          alert('올바른 백업 JSON 파일이 아닙니다.');
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    // Dark Mode Toggle
+    function toggleDarkMode() {
+      const isDark = document.documentElement.classList.toggle('dark');
+      localStorage.setItem('morning_mind_theme', isDark ? 'dark' : 'light');
+    }
+    if (localStorage.getItem('morning_mind_theme') === 'dark') {
+      document.documentElement.classList.add('dark');
+    }
+  </script>
+</body>
+</html>
